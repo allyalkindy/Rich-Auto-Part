@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/layout/Navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Edit, Trash2, Package, Tag, Layers, Hash, DollarSign, AlertTriangle, XCircle, PlusCircle } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 interface Product {
   _id: string;
   productName: string;
   category: string;
+  type?: string;
   quantity: number;
   pricePerUnit: number;
   minimumStock: number;
@@ -36,13 +38,15 @@ export default function ProductsPage() {
   const queryClient = useQueryClient();
   
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     productName: '',
     category: '',
+    type: '',
     quantity: '',
     pricePerUnit: '',
     minimumStock: '',
-  });
+  };
+  const [formData, setFormData] = useState(initialFormData);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [restockAmount, setRestockAmount] = useState('');
@@ -58,6 +62,7 @@ export default function ProductsPage() {
       setFormData({
         productName: selectedProduct.productName,
         category: selectedProduct.category,
+        type: selectedProduct.type || '',
         quantity: selectedProduct.quantity.toString(),
         pricePerUnit: selectedProduct.pricePerUnit.toString(),
         minimumStock: selectedProduct.minimumStock.toString(),
@@ -75,13 +80,7 @@ export default function ProductsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       setShowForm(false);
-      setFormData({
-        productName: '',
-        category: '',
-        quantity: '',
-        pricePerUnit: '',
-        minimumStock: '',
-      });
+      setFormData(initialFormData);
     },
   });
 
@@ -107,6 +106,7 @@ export default function ProductsPage() {
     e.preventDefault();
     createMutation.mutate({
       ...formData,
+      type: formData.type || undefined,
       quantity: formData.quantity === '' ? 0 : Number(formData.quantity),
       pricePerUnit: formData.pricePerUnit === '' ? 0 : Number(formData.pricePerUnit),
       minimumStock: formData.minimumStock === '' ? 0 : Number(formData.minimumStock),
@@ -138,7 +138,7 @@ export default function ProductsPage() {
   }
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <Loader fullScreen message="Loading products..." />;
   }
 
   if (status === 'unauthenticated') {
@@ -152,7 +152,7 @@ export default function ProductsPage() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900 font-heading">Products</h1>
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => { setFormData(initialFormData); setShowForm(true); }}
               className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 flex items-center"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -190,6 +190,18 @@ export default function ProductsPage() {
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-primary-500 focus:border-primary-500 bg-white shadow-sm text-gray-900"
                     required
+                  />
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-400">
+                    <Tag className="w-5 h-5" />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Type (optional, e.g. OEM, Aftermarket)"
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    className="pl-10 pr-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-primary-500 focus:border-primary-500 bg-white shadow-sm text-gray-900"
                   />
                 </div>
                 <div className="relative">
@@ -245,7 +257,7 @@ export default function ProductsPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setShowForm(false)}
+                    onClick={() => { setShowForm(false); setFormData(initialFormData); }}
                     className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-400 shadow-md transition-all"
                   >
                     Cancel
@@ -273,14 +285,16 @@ export default function ProductsPage() {
             <div>Loading products...</div>
           ) : (
             <div className="bg-white shadow rounded-lg overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
+              <div className="overflow-x-auto">
+              <table className="min-w-full table-fixed divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Min Stock</th>
+                    <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Product</th>
+                    <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Category</th>
+                    <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Type</th>
+                    <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Quantity</th>
+                    <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Price</th>
+                    <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Min Stock</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -290,41 +304,44 @@ export default function ProductsPage() {
                     return (
                       product.productName.toLowerCase().includes(s) ||
                       product.category.toLowerCase().includes(s) ||
+                      (product.type ? product.type.toLowerCase().includes(s) : false) ||
                       product.quantity.toString().includes(s) ||
                       product.pricePerUnit.toString().includes(s) ||
                       product.minimumStock.toString().includes(s)
                     );
                   }) || []).map((product) => (
                     <tr key={product._id} onClick={() => { setSelectedProduct(product); setShowModal(true); }} className="cursor-pointer hover:bg-gray-100">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap">
                         <div className="flex items-center">
                           <Package className="w-5 h-5 text-gray-400 mr-3" />
-                          <div className="text-sm font-medium text-gray-900">{product.productName}</div>
+                          <div className="text-sm font-medium text-gray-900 truncate max-w-[140px] sm:max-w-none">{product.productName}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.category}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`text-sm font-medium ${
+                      <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm text-gray-500">{product.category}</td>
+                      <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap text-xs sm:text-sm text-gray-500">{product.type || '-'}</td>
+                      <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap">
+                        <span className={`text-xs sm:text-sm font-medium ${
                           product.quantity <= product.minimumStock ? 'text-red-600' : 'text-gray-900'
                         }`}>
                           {product.quantity}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-numbers">
+                      <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap text-xs sm:text-sm text-gray-500 font-numbers">
                         Tshs {product.pricePerUnit.toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.minimumStock}</td>
+                      <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap text-xs sm:text-sm text-gray-500">{product.minimumStock}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>
       </div>
       {showModal && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-lg mx-4 sm:mx-0 bg-white rounded-3xl shadow-2xl p-0 overflow-hidden animate-modal-pop">
+          <div className="relative w-full max-w-lg mx-4 sm:mx-0 bg-white rounded-3xl shadow-2xl p-0 max-h-[90vh] overflow-y-auto animate-modal-pop">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white">
               <div className="flex items-center gap-3">
@@ -350,6 +367,7 @@ export default function ProductsPage() {
                 body: JSON.stringify({
                   productName: formData.productName,
                   category: formData.category,
+                  type: formData.type || undefined,
                   quantity: formData.quantity === '' ? 0 : Number(formData.quantity),
                   pricePerUnit: formData.pricePerUnit === '' ? 0 : Number(formData.pricePerUnit),
                   minimumStock: formData.minimumStock === '' ? 0 : Number(formData.minimumStock),
@@ -378,6 +396,15 @@ export default function ProductsPage() {
                     value={formData.category}
                     onChange={e => setFormData({ ...formData, category: e.target.value })}
                     required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Type (optional)</label>
+                  <input
+                    type="text"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 shadow-sm bg-gray-50"
+                    value={formData.type}
+                    onChange={e => setFormData({ ...formData, type: e.target.value })}
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -441,7 +468,7 @@ export default function ProductsPage() {
       {/* Custom Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full relative animate-modal-pop">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full relative max-h-[90vh] overflow-y-auto animate-modal-pop mx-4 sm:mx-0">
             <div className="flex items-center gap-3 mb-4">
               <Trash2 className="w-8 h-8 text-red-600" />
               <h2 className="text-xl font-bold text-gray-900">Confirm Deletion</h2>

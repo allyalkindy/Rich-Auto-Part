@@ -38,7 +38,7 @@ export async function sendLowStockAlert(products: LowStockProduct[]) {
         ${products
           .map(
             (product) =>
-              `<li><strong>${product.productName}</strong> (${product.category}): ${product.quantity} remaining (minimum: ${product.minimumStock})</li>`
+              `<li><strong>${product.productName}</strong> (${product.category}${product.type ? ' • ' + product.type : ''}): ${product.quantity} remaining (minimum: ${product.minimumStock})</li>`
           )
           .join('')}
       </ul>

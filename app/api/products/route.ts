@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const category = searchParams.get('category');
+    const type = searchParams.get('type');
 
     let query: any = {};
 
@@ -26,6 +27,19 @@ export async function GET(request: NextRequest) {
 
     if (category) {
       query.category = category;
+    }
+    if (type) {
+      query.type = type;
+    }
+
+    // If search is provided, include category and type in text search
+    if (search) {
+      query.$or = [
+        { productName: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } },
+        { type: { $regex: search, $options: 'i' } },
+      ];
+      delete query.productName;
     }
 
     const products = await Product.find(query).sort({ createdAt: -1 });
@@ -47,7 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { productName, category, quantity, pricePerUnit, minimumStock } =
+    const { productName, category, quantity, pricePerUnit, minimumStock, type } =
       await request.json();
 
     if (!productName || !category || quantity === undefined || pricePerUnit === undefined || minimumStock === undefined) {
@@ -62,6 +76,7 @@ export async function POST(request: NextRequest) {
     const product = await Product.create({
       productName,
       category,
+      type,
       quantity,
       pricePerUnit,
       minimumStock,
@@ -73,6 +88,7 @@ export async function POST(request: NextRequest) {
         _id: product._id.toString(),
         productName,
         category,
+        type,
         quantity,
         minimumStock,
       }]);

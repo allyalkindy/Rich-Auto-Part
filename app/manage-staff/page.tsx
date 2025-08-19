@@ -100,17 +100,18 @@ export default function ManageStaffPage() {
           <div className="bg-white rounded-xl p-6 shadow">Loading users...</div>
         ) : (
           <div className="bg-white shadow rounded-2xl overflow-hidden border border-primary-100">
+            <div className="overflow-x-auto">
             <table className="min-w-full table-fixed divide-y divide-gray-200">
               <colgroup>
-                <col className="w-2/5" />
-                <col className="w-2/5" />
-                <col className="w-1/5" />
+                <col className="w-1/2 sm:w-2/5" />
+                <col className="w-1/2 sm:w-2/5" />
+                <col className="w-1/3 sm:w-1/5" />
               </colgroup>
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+                  <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                  <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                  <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wider">Role</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -123,21 +124,21 @@ export default function ManageStaffPage() {
                     const roleLabel = u.role === 'owner' ? 'Owner' : 'Staff';
                     return (
                       <tr key={u._id} className="hover:bg-primary-50 cursor-pointer" onClick={() => openModal(u)}>
-                        <td className="px-6 py-4 align-middle">
+                        <td className="px-2 py-2 sm:px-6 sm:py-4 align-middle">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold">
                               {u.name.split(' ').map(n => n[0]).join('').slice(0,2)}
                             </div>
                             <div className="min-w-0">
-                              <div className="text-sm font-semibold text-gray-900 truncate">{u.name}</div>
+                              <div className="text-xs sm:text-sm font-semibold text-gray-900 truncate max-w-[140px] sm:max-w-none">{u.name}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 align-middle">
-                          <div className="flex items-center gap-2 text-sm text-gray-700 truncate"><Mail className="w-4 h-4 text-gray-400" />{u.email}</div>
+                        <td className="px-2 py-2 sm:px-6 sm:py-4 align-middle">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 truncate max-w-[140px] sm:max-w-none"><Mail className="w-4 h-4 text-gray-400" />{u.email}</div>
                         </td>
-                        <td className="px-6 py-4 align-middle">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-semibold ${roleStyles}`}>
+                        <td className="px-2 py-2 sm:px-6 sm:py-4 align-middle">
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-[10px] sm:text-xs font-semibold ${roleStyles}`}>
                             <Shield className="w-3 h-3" /> {roleLabel}
                           </span>
                         </td>
@@ -146,12 +147,13 @@ export default function ManageStaffPage() {
                   })}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 
         {modalUser && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-xl relative overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-xl relative max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
               <button className="absolute top-4 right-4 text-gray-400 hover:text-primary-600" onClick={() => setModalUser(null)}>
                 <XCircle className="w-6 h-6" />
               </button>

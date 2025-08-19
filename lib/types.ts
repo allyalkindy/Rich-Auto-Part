@@ -12,6 +12,7 @@ export interface Product {
   _id: string;
   productName: string;
   category: string;
+  type?: string;
   quantity: number;
   pricePerUnit: number;
   minimumStock: number;
@@ -66,6 +67,7 @@ export interface LowStockProduct {
   _id: string;
   productName: string;
   category: string;
+  type?: string;
   quantity: number;
   minimumStock: number;
 }

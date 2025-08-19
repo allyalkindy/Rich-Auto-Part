@@ -15,7 +15,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { productName, category, quantity, pricePerUnit, minimumStock } =
+    const { productName, category, type, quantity, pricePerUnit, minimumStock } =
       await request.json();
 
     await dbConnect();
@@ -25,6 +25,7 @@ export async function PUT(
       {
         productName,
         category,
+        type,
         quantity,
         pricePerUnit,
         minimumStock,
@@ -45,6 +46,7 @@ export async function PUT(
         _id: product._id.toString(),
         productName: product.productName,
         category: product.category,
+        type: product.type,
         quantity: product.quantity,
         minimumStock: product.minimumStock,
       }]);
@@ -121,6 +123,7 @@ export async function POST(
             _id: product._id.toString(),
             productName: product.productName,
             category: product.category,
+            type: product.type,
             quantity: product.quantity,
             minimumStock: product.minimumStock,
           },

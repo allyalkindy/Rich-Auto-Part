@@ -18,27 +18,32 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
+  // Load products once
   useEffect(() => {
-    if (search.trim() === '') {
+    setLoading(true);
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => setProducts(data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Filter as search changes
+  useEffect(() => {
+    const query = search.trim().toLowerCase();
+    if (query === '') {
       setFiltered([]);
       setSearched(false);
       return;
     }
-    setLoading(true);
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
-        setFiltered(
-          data.filter((p: any) =>
-            p.productName.toLowerCase().includes(search.toLowerCase()) ||
-            p.category.toLowerCase().includes(search.toLowerCase())
-          )
-        );
-        setSearched(true);
-        setLoading(false);
-      });
-  }, [search]);
+    setFiltered(
+      (products as any[]).filter((p: any) =>
+        p.productName.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query) ||
+        (p.type ? p.type.toLowerCase().includes(query) : false)
+      )
+    );
+    setSearched(true);
+  }, [search, products]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -83,7 +88,7 @@ export default function HomePage() {
             <div className="relative flex-1">
               <input
                 type="text"
-                placeholder="Search by product name or category..."
+                placeholder="Search by product name, category, or type..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 placeholder-gray-400 text-lg transition-all"
@@ -96,20 +101,22 @@ export default function HomePage() {
             <div className="mt-6">
               {filtered.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 bg-white rounded-xl">
+                  <table className="min-w-full table-fixed divide-y divide-gray-200 bg-white rounded-xl">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity Left</th>
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase w-1/2">Product</th>
+                        <th className="hidden sm:table-cell px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Category</th>
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase w-1/4">Type</th>
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase w-1/4">Quantity Left</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filtered.map((product, idx) => (
                         <tr key={idx} className="hover:bg-primary-50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{(product as any).productName}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-700">{(product as any).category}</td>
-                          <td className={`px-6 py-4 whitespace-nowrap font-bold ${(product as any).quantity <= (product as any).minimumStock ? 'text-red-600' : 'text-green-700'}`}>{(product as any).quantity}</td>
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap font-semibold text-gray-900 truncate max-w-[140px] sm:max-w-none">{(product as any).productName}</td>
+                          <td className="hidden sm:table-cell px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-gray-700">{(product as any).category}</td>
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-gray-700 text-xs sm:text-sm">{(product as any).type || '-'}</td>
+                          <td className={`px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap font-bold text-xs sm:text-sm ${(product as any).quantity <= (product as any).minimumStock ? 'text-red-600' : 'text-green-700'}`}>{(product as any).quantity}</td>
                         </tr>
                       ))}
                     </tbody>

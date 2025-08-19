@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/layout/Navigation';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart3, Calendar, DollarSign, Package } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 interface YearlyReport {
   totalSalesAmount: number;
@@ -44,7 +45,7 @@ export default function YearlyReportsPage() {
   }, [status, router]);
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <Loader fullScreen message="Loading yearly report..." />;
   }
 
   if (status === 'unauthenticated') {
@@ -128,24 +129,24 @@ export default function YearlyReportsPage() {
                 
                 {report?.monthlyBreakdown && report.monthlyBreakdown.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
+                    <table className="min-w-full table-fixed divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Month</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Sales</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity Sold</th>
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Month</th>
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Total Sales</th>
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase">Quantity Sold</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {report.monthlyBreakdown.map((month, index) => (
                           <tr key={index}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                               {month.month}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-numbers">
+                            <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 font-numbers">
                               Tshs. {month.totalSales.toFixed(2)}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                               {month.totalQuantity}
                             </td>
                           </tr>

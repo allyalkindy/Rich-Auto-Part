@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { Navigation } from '@/components/layout/Navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Package, ShoppingCart, DollarSign, AlertTriangle, BarChart3 } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 interface DashboardStats {
   totalProducts: number;
@@ -51,14 +52,7 @@ export default function DashboardPage() {
   }, [status, router]);
 
   if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loader fullScreen message="Preparing your dashboard..." />;
   }
 
   if (status === 'unauthenticated') {

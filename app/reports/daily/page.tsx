@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/layout/Navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, TrendingUp, Package, Users, DollarSign, XCircle, Edit, Trash2 } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 interface Sale {
   _id: string;
@@ -92,7 +93,7 @@ export default function DailyReportPage() {
   };
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <Loader fullScreen message="Loading daily report..." />;
   }
 
   if (status === 'unauthenticated') {
@@ -167,27 +168,27 @@ export default function DailyReportPage() {
                 </div>
               </div>
 
-              <div className="bg-white shadow rounded-lg">
+              <div className="bg-white shadow rounded-lg overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200">
                   <h2 className="text-lg font-medium text-gray-900">Sales Details</h2>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
+                  <table className="min-w-full table-fixed divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                           Product
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                           Quantity
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                           Price
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                           Staff
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                           Time
                         </th>
                       </tr>
@@ -199,19 +200,19 @@ export default function DailyReportPage() {
                           onClick={() => handleSaleClick(sale)}
                           className="cursor-pointer hover:bg-gray-50 transition-colors"
                         >
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[140px] sm:max-w-none">
                             {sale.productName}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                             {sale.quantitySold}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                             Tshs. {sale.salePrice.toFixed(2)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                             {sale.staffName}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                             {new Date(sale.date).toLocaleTimeString()}
                           </td>
                         </tr>
@@ -232,7 +233,7 @@ export default function DailyReportPage() {
       {/* Sales Edit Modal */}
       {showModal && selectedSale && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity animate-fade-in">
-          <div className="relative w-full max-w-lg mx-4 sm:mx-0 bg-white rounded-3xl shadow-2xl p-0 overflow-hidden animate-modal-pop">
+          <div className="relative w-full max-w-lg mx-4 sm:mx-0 bg-white rounded-3xl shadow-2xl p-0 max-h-[90vh] overflow-y-auto animate-modal-pop">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white">
               <div className="flex items-center gap-3">
@@ -311,7 +312,7 @@ export default function DailyReportPage() {
       {/* Custom Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full relative animate-modal-pop">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full relative animate-modal-pop mx-4 sm:mx-0">
             <div className="flex items-center gap-3 mb-4">
               <Trash2 className="w-8 h-8 text-red-600" />
               <h2 className="text-xl font-bold text-gray-900">Confirm Deletion</h2>

@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/layout/Navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShoppingCart, Search, X } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 interface Product {
   _id: string;
   productName: string;
   category: string;
+  type?: string;
   quantity: number;
   pricePerUnit: number;
 }
@@ -98,7 +100,8 @@ export default function SalesPage() {
 
   const filteredProducts = products?.filter(product =>
     product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.type ? product.type.toLowerCase().includes(searchTerm.toLowerCase()) : false)
   ) || [];
 
   const selectedProductData = products?.find(p => p._id === selectedProduct);
@@ -123,7 +126,7 @@ export default function SalesPage() {
   };
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <Loader fullScreen message="Loading sales..." />;
   }
 
   if (status === 'unauthenticated') {
@@ -208,7 +211,7 @@ export default function SalesPage() {
                                 >
                                   <div className="font-medium text-gray-900">{product.productName}</div>
                                   <div className="text-sm text-gray-500">
-                                    {product.category} • Stock: {product.quantity} • Tshs. {product.pricePerUnit.toFixed(2)}
+                                    {product.category}{product.type ? ` • ${product.type}` : ''} • Stock: {product.quantity} • Tshs. {product.pricePerUnit.toFixed(2)}
                                   </div>
                                 </button>
                               ))}
@@ -233,7 +236,7 @@ export default function SalesPage() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-medium text-green-900">{selectedProductData.productName}</h3>
-                          <p className="text-sm text-green-700">{selectedProductData.category}</p>
+                          <p className="text-sm text-green-700">{selectedProductData.category}{selectedProductData.type ? ` • ${selectedProductData.type}` : ''}</p>
                         </div>
                         <button
                           type="button"
@@ -373,7 +376,7 @@ export default function SalesPage() {
               {salesLoading ? (
                 <div className="text-gray-500">Loading sales...</div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 overflow-x-auto">
                   {sales && sales.length > 0 ? (
                     sales.slice(0, 10).map((sale) => (
                       <div key={sale._id} className="border-b border-gray-200 pb-4 last:border-b-0">

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     const sales = await Sale.find(query)
-      .populate('productId', 'productName category')
+      .populate('productId', 'productName category type')
       .sort({ date: -1 });
 
     return NextResponse.json(sales);
@@ -109,6 +109,7 @@ export async function POST(request: NextRequest) {
         _id: product._id.toString(),
         productName: product.productName,
         category: product.category,
+        type: product.type,
         quantity: newQuantity,
         minimumStock: product.minimumStock,
       }]);

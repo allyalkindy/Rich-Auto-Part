@@ -6,11 +6,13 @@ import { useEffect } from 'react';
 import { Navigation } from '@/components/layout/Navigation';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Package, TrendingDown } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 interface LowStockProduct {
   _id: string;
   productName: string;
   category: string;
+  type?: string;
   quantity: number;
   minimumStock: number;
 }
@@ -36,7 +38,7 @@ export default function LowStockPage() {
   }, [status, router]);
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <Loader fullScreen message="Loading low stock items..." />;
   }
 
   if (status === 'unauthenticated') {
@@ -93,22 +95,25 @@ export default function LowStockPage() {
                 
                 {lowStockProducts && lowStockProducts.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
+                    <table className="min-w-full table-fixed divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                             Product
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                             Category
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                             Current Stock
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                             Minimum Stock
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
                             Status
                           </th>
                         </tr>
@@ -132,17 +137,20 @@ export default function LowStockPage() {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {product.category}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`text-sm font-medium ${
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {product.type || '-'}
+                              </td>
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
+                                <span className={`text-xs sm:text-sm font-medium ${
                                   isCritical ? 'text-red-600' : 'text-orange-600'
                                 }`}>
                                   {product.quantity}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                                 {product.minimumStock}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
                                 {isCritical ? (
                                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                     <AlertTriangle className="w-3 h-3 mr-1" />

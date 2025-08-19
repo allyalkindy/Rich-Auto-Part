@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
       _id: product._id.toString(),
       productName: product.productName,
       category: product.category,
+      type: product.type,
       quantity: product.quantity,
       minimumStock: product.minimumStock,
     }));
