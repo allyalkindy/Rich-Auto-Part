@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Package, Search, Phone, Mail, MessageCircle, CheckCircle, Star, Users, Shield, ShoppingCart, Globe, Home as HomeIcon, User2, Copy } from 'lucide-react';
+import { Product } from '@/lib/types';
 // REMOVE: import { Navigation } from '@/components/layout/Navigation';
 
 function copyToClipboard(text: string, setTooltip: (tooltip: string) => void) {
@@ -13,8 +14,8 @@ function copyToClipboard(text: string, setTooltip: (tooltip: string) => void) {
 
 export default function HomePage() {
   const [search, setSearch] = useState('');
-  const [products, setProducts] = useState([]);
-  const [filtered, setFiltered] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filtered, setFiltered] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
@@ -23,7 +24,11 @@ export default function HomePage() {
     setLoading(true);
     fetch('/api/products')
       .then(res => res.json())
-      .then(data => setProducts(data))
+      .then((data: Product[]) => setProducts(data))
+      .catch(error => {
+        console.error('Error fetching products:', error);
+        setProducts([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -36,7 +41,7 @@ export default function HomePage() {
       return;
     }
     setFiltered(
-      (products as any[]).filter((p: any) =>
+      products.filter((p: Product) =>
         p.productName.toLowerCase().includes(query) ||
         p.category.toLowerCase().includes(query) ||
         (p.type ? p.type.toLowerCase().includes(query) : false)
@@ -113,10 +118,10 @@ export default function HomePage() {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filtered.map((product, idx) => (
                         <tr key={idx} className="hover:bg-primary-50 transition-colors">
-                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap font-semibold text-gray-900 truncate max-w-[140px] sm:max-w-none">{(product as any).productName}</td>
-                          <td className="hidden sm:table-cell px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-gray-700">{(product as any).category}</td>
-                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-gray-700 text-xs sm:text-sm">{(product as any).type || '-'}</td>
-                          <td className={`px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap font-bold text-xs sm:text-sm ${(product as any).quantity <= (product as any).minimumStock ? 'text-red-600' : 'text-green-700'}`}>{(product as any).quantity}</td>
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap font-semibold text-gray-900 truncate max-w-[140px] sm:max-w-none">{product.productName}</td>
+                          <td className="hidden sm:table-cell px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-gray-700">{product.category}</td>
+                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-gray-700 text-xs sm:text-sm">{product.type || '-'}</td>
+                          <td className={`px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap font-bold text-xs sm:text-sm ${product.quantity <= product.minimumStock ? 'text-red-600' : 'text-green-700'}`}>{product.quantity}</td>
                         </tr>
                       ))}
                     </tbody>
