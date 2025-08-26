@@ -135,7 +135,7 @@ export default function HomePage() {
         <section className="relative z-10 px-6 py-8 max-w-3xl mx-auto">
           <div className="bg-primary-50 border border-primary-100 rounded-2xl shadow flex flex-col items-center py-8">
             <h3 className="text-lg font-semibold text-primary-700 mb-2">Are you staff?</h3>
-            <a href="/login" className="px-8 py-3 bg-primary-600 text-white font-bold rounded-xl text-lg hover:bg-primary-700 transition-all duration-300 shadow">Login</a>
+            <Link href="/login" className="px-8 py-3 bg-primary-600 text-white font-bold rounded-xl text-lg hover:bg-primary-700 transition-all duration-300 shadow">Login</Link>
         </div>
       </section>
 
