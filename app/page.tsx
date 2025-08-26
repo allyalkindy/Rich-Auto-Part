@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Package, Search, Phone, Mail, MessageCircle, CheckCircle, Star, Users, Shield, ShoppingCart, Globe, Home as HomeIcon, User2, Copy } from 'lucide-react';
 import { Product } from '@/lib/types';
-// REMOVE: import { Navigation } from '@/components/layout/Navigation';
+import { useProducts } from '@/lib/hooks/useProducts';
 
 function copyToClipboard(text: string, setTooltip: (tooltip: string) => void) {
   navigator.clipboard.writeText(text);
@@ -14,24 +14,12 @@ function copyToClipboard(text: string, setTooltip: (tooltip: string) => void) {
 
 export default function HomePage() {
   const [search, setSearch] = useState('');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filtered, setFiltered] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [filtered, setFiltered] = useState<any[]>([]);
   const [searched, setSearched] = useState(false);
 
-  // Load products once
-  useEffect(() => {
-    setLoading(true);
-    fetch('/api/products')
-      .then(res => res.json())
-      .then((data: Product[]) => setProducts(data))
-      .catch(error => {
-        console.error('Error fetching products:', error);
-        setProducts([]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
+  // Use React Query to fetch products
+  const { data: products = [], isLoading, error } = useProducts();
+  
   // Filter as search changes
   useEffect(() => {
     const query = search.trim().toLowerCase();
@@ -40,20 +28,24 @@ export default function HomePage() {
       setSearched(false);
       return;
     }
-    setFiltered(
-      products.filter((p: Product) =>
-        p.productName.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query) ||
-        (p.type ? p.type.toLowerCase().includes(query) : false)
-      )
-    );
-    setSearched(true);
+    
+    // Only filter if products are loaded
+    if (products.length > 0) {
+      setFiltered(
+        products.filter((p: any) =>
+          p.productName.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query) ||
+          (p.type ? p.type.toLowerCase().includes(query) : false)
+        )
+      );
+      setSearched(true);
+    }
   }, [search, products]);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Custom Home Navigation Bar */}
-      <nav className="w-full bg-white/80 backdrop-blur-md border-b border-primary-100 shadow-lg fixed top-0 left-0 z-50 flex items-center h-16 px-4 lg:px-8 transition-all duration-300 sticky">
+      <nav className="w-full bg-white/80 backdrop-blur-md border-b border-primary-100 shadow-lg fixed top-0 left-0 z-50 flex items-center h-16 px-4 lg:px-8 transition-all duration-300 ">
         <div className="flex items-center gap-2">
           <HomeIcon className="w-7 h-7 text-primary-600" />
           <span className="text-xs sm:text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Rich Auto Parts</span>
@@ -101,7 +93,12 @@ export default function HomePage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-6 h-6" />
               </div>
           </div>
-          {loading && <div className="text-center text-gray-400">Searching...</div>}
+          {isLoading && <div className="text-center text-gray-400">Searching...</div>}
+          {error && (
+            <div className="text-center text-red-400 font-semibold text-lg">
+              Error loading products. Please try again later.
+            </div>
+          )}
           {searched && (
             <div className="mt-6">
               {filtered.length > 0 ? (
@@ -199,11 +196,11 @@ export default function HomePage() {
           <div className="flex justify-center gap-6 mt-10">
             <div className="flex flex-col items-center">
               <User2 className="w-6 h-6 text-primary-400 mb-1" />
-              <span className="text-xs text-gray-500">Owner: Ally Mohammed</span>
+              <span className="text-xs text-gray-500">Owner: Seif</span>
         </div>
             <div className="flex flex-col items-center">
               <Globe className="w-6 h-6 text-primary-400 mb-1" />
-              <span className="text-xs text-gray-500">Dar es Salaam, Tanzania</span>
+              <span className="text-xs text-gray-500">Gombani kongwe, Chake Chake</span>
           </div>
         </div>
       </section>
