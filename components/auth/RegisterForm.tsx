@@ -82,7 +82,7 @@ export function RegisterForm() {
       }
     } catch (err: any) {
       if (err?.name === 'AbortError') {
-        setError('Request timed out. Please ensure the server/database is running.');
+        setError('Request timed out. Make sure you have network acess');
       } else {
         setError('An error occurred. Please try again.');
       }
