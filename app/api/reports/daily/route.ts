@@ -50,26 +50,19 @@ export async function GET(request: NextRequest) {
     if (sales.length === 0) {
       console.log('No sales found with date range, trying alternative search...');
       
-      // Try searching by date string (in case dates are stored as strings)
-      const dateString = dateParam;
+      // Try a broader date range search (same day but with more flexible time)
+      const startOfDayFlexible = new Date(year, month - 1, day);
+      const endOfDayFlexible = new Date(year, month - 1, day + 1);
+      
       const alternativeSales = await Sale.find({
-        $or: [
-          { date: { $gte: startOfDay, $lte: endOfDay } },
-          { date: { $regex: dateString, $options: 'i' } }
-        ]
+        date: { 
+          $gte: startOfDayFlexible, 
+          $lt: endOfDayFlexible 
+        }
       }).sort({ date: -1 });
       
       console.log('Alternative search found:', alternativeSales.length, 'sales');
-      
-      // If still no sales, show all sales as fallback
-      if (alternativeSales.length === 0) {
-        console.log('No sales found with alternative search, showing all sales as fallback');
-        const allSales = await Sale.find({}).sort({ date: -1 }).limit(50);
-        salesFound = allSales;
-        isFallbackData = true;
-      } else {
-        salesFound = alternativeSales;
-      }
+      salesFound = alternativeSales;
     }
     
     // Debug: Log the first few sales to see their date format
@@ -122,6 +115,10 @@ export async function GET(request: NextRequest) {
       })),
       date: dateParam,
       isFallbackData, // Add flag to indicate if this is fallback data
+      hasSales: salesFound.length > 0,
+      message: salesFound.length === 0 
+        ? `No sales recorded for ${dateParam}` 
+        : `Found ${salesFound.length} sales for ${dateParam}`,
     };
 
     console.log('Report generated:', {

@@ -11,7 +11,7 @@ const fetchProducts = async (): Promise<PublicProduct[]> => {
   if (!response.ok) {
     throw new Error('Failed to fetch products');
   }
-  return response.json();
+  return response.json(); 
 };
 
 export const useProducts = () => {

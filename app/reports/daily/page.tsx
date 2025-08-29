@@ -123,108 +123,138 @@ export default function DailyReportPage() {
           </div>
 
           {isLoading ? (
-            <div>Loading report...</div>
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                <p className="text-gray-500">Loading report...</p>
+              </div>
+            </div>
           ) : report ? (
             <>
-              {report.isFallbackData && (
-                <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                  <p className="text-orange-800">
-                    <strong>Note:</strong> No sales found for {selectedDate}. Showing recent sales from all dates instead.
-                  </p>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <div className="flex items-center">
-                    <Package className="w-8 h-8 text-primary-600 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Total Sales</p>
-                      <p className="text-2xl font-bold text-gray-900">{report.totalSales}</p>
+              {!report.hasSales ? (
+                <div className="text-center py-12">
+                  <div className="mb-6">
+                    <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Sales for {selectedDate}</h3>
+                    <p className="text-gray-500 mb-6">
+                      There are no sales recorded for {selectedDate}. This could mean:
+                    </p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+                      <ul className="text-sm text-blue-700 space-y-2">
+                        <li>• No sales were made on this date</li>
+                        <li>• Sales might be recorded for a different date</li>
+                        <li>• Try selecting a different date</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <div className="flex items-center">
-                    <DollarSign className="w-8 h-8 text-green-600 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        Tshs. {report.totalSalesAmount?.toFixed(2) || '0.00'}
-                      </p>
+              ) : (
+                <>
+                  <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-800 font-medium">
+                      {report.message}
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded-lg shadow">
+                      <div className="flex items-center">
+                        <Package className="w-8 h-8 text-primary-600 mr-3" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Total Sales</p>
+                          <p className="text-2xl font-bold text-gray-900">{report.totalSales}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow">
+                      <div className="flex items-center">
+                        <DollarSign className="w-8 h-8 text-green-600 mr-3" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                          <p className="text-2xl font-bold text-gray-900">
+                            Tshs. {report.totalSalesAmount?.toFixed(2) || '0.00'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow">
+                      <div className="flex items-center">
+                        <TrendingUp className="w-8 h-8 text-blue-600 mr-3" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Average Sale</p>
+                          <p className="text-2xl font-bold text-gray-900">
+                            Tshs. {report.totalSales > 0 ? (report.totalSalesAmount / report.totalSales).toFixed(2) : '0.00'}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <div className="flex items-center">
-                    <TrendingUp className="w-8 h-8 text-blue-600 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Average Sale</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        Tshs. {report.totalSales > 0 ? (report.totalSalesAmount / report.totalSales).toFixed(2) : '0.00'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              <div className="bg-white shadow rounded-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Sales Details</h2>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full table-fixed divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                          Product
-                        </th>
-                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                          Quantity
-                        </th>
-                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                          Price
-                        </th>
-                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                          Staff
-                        </th>
-                        <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                          Time
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {report.sales.map((sale) => (
-                        <tr 
-                          key={sale._id} 
-                          onClick={() => handleSaleClick(sale)}
-                          className="cursor-pointer hover:bg-gray-50 transition-colors"
-                        >
-                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[140px] sm:max-w-none">
-                            {sale.productName}
-                          </td>
-                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                            {sale.quantitySold}
-                          </td>
-                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                            Tshs. {sale.salePrice.toFixed(2)}
-                          </td>
-                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                            {sale.staffName}
-                          </td>
-                          <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                            {new Date(sale.date).toLocaleTimeString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                  <div className="bg-white shadow rounded-lg overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                      <h2 className="text-lg font-medium text-gray-900">Sales Details</h2>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full table-fixed divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                              Product
+                            </th>
+                            <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                              Quantity
+                            </th>
+                            <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                              Price
+                            </th>
+                            <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                              Staff
+                            </th>
+                            <th className="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                              Time
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {report.sales.map((sale) => (
+                            <tr 
+                              key={sale._id} 
+                              onClick={() => handleSaleClick(sale)}
+                              className="cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-normal sm:whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[140px] sm:max-w-none">
+                                {sale.productName}
+                              </td>
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                                {sale.quantitySold}
+                              </td>
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                                Tshs. {sale.salePrice.toFixed(2)}
+                              </td>
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                                {sale.staffName}
+                              </td>
+                              <td className="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                                {new Date(sale.date).toLocaleTimeString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500">No sales data available for the selected date.</p>
+              <div className="mb-4">
+                <XCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Unable to Load Report</h3>
+                <p className="text-gray-500">
+                  There was an error loading the sales report. Please try again.
+                </p>
+              </div>
             </div>
           )}
         </div>

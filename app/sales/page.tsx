@@ -378,28 +378,62 @@ export default function SalesPage() {
               ) : (
                 <div className="space-y-4 overflow-x-auto">
                   {sales && sales.length > 0 ? (
-                    sales.slice(0, 10).map((sale) => (
-                      <div key={sale._id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium text-gray-900">{sale.productName}</h3>
-                            <p className="text-sm text-gray-500">
-                              {sale.quantitySold} units • Tshs. {sale.salePrice.toFixed(2)}
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              {new Date(sale.date).toLocaleDateString()} by {sale.staffName}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-lg font-semibold text-green-600">
-                              Tshs. {sale.salePrice.toFixed(2)}
-                            </span>
-                          </div>
+                    <>
+                      <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-green-800">
+                            Today's Sales: {sales.filter(sale => {
+                              const saleDate = new Date(sale.date);
+                              const today = new Date();
+                              return saleDate.toDateString() === today.toDateString();
+                            }).length}
+                          </span>
+                          <span className="text-sm text-green-600">
+                            Total: Tshs. {sales.reduce((sum, sale) => sum + sale.salePrice, 0).toFixed(2)}
+                          </span>
                         </div>
                       </div>
-                    ))
+                      
+                      {sales.slice(0, 10).map((sale) => (
+                        <div key={sale._id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-medium text-gray-900">{sale.productName}</h3>
+                              <p className="text-sm text-gray-500">
+                                {sale.quantitySold} units • Tshs. {sale.salePrice.toFixed(2)}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {new Date(sale.date).toLocaleDateString()} by {sale.staffName}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-lg font-semibold text-green-600">
+                                Tshs. {sale.salePrice.toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
                   ) : (
-                    <p className="text-gray-500 text-center py-8">No sales recorded yet.</p>
+                    <div className="text-center py-8">
+                      <div className="mb-4">
+                        <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No Sales Today</h3>
+                        <p className="text-gray-500 mb-4">
+                          There are no sales recorded for today. Start by recording your first sale using the form on the left.
+                        </p>
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                          <h4 className="font-medium text-blue-900 mb-2">Getting Started</h4>
+                          <ul className="text-sm text-blue-700 space-y-1">
+                            <li>• Search for a product in the form</li>
+                            <li>• Select the product and enter quantity</li>
+                            <li>• Adjust selling price if needed</li>
+                            <li>• Click "Record Sale" to complete</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
